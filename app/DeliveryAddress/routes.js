@@ -22,7 +22,7 @@ router.get(
     deliveryAddressController.getAllDeliveryAddress
 );
 router.delete(
-    '/delivery-address',
+    '/delivery-address/:id',
     policeCheck('delete', 'DeliveryAddress'),
     deliveryAddressController.deleteDeliveryAddressById
 );

@@ -1,7 +1,3 @@
-const path = require('path');
-const fs = require('fs');
-const config = require('../config');
-const mongoose = require('mongoose');
 const Product = require('./model');
 const Category = require('../category/model');
 const Tag = require('../tag/model');
@@ -9,6 +5,7 @@ const Tag = require('../tag/model');
 const addProduct = async (req, res, next) => {
     try {
         let payload = req.body;
+        let image = req.file;
 
         if (payload.category) {
             let category = await Category.findOne({
@@ -32,38 +29,15 @@ const addProduct = async (req, res, next) => {
             }
         }
 
-        if (req.file) {
-            let tmpPath = req.file.path;
-            let originalExt = req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
-            let fileName = req.file.filename + '.' + originalExt;
-            let targetPath = path.resolve(config.rootPath, `public/images/products/${fileName}`);
+        let image_url = null;
 
-            const src = fs.createReadStream(tmpPath);
-            const dest = fs.createWriteStream(targetPath);
-            src.pipe(dest);
+        if (image) {
+            const originaFileName = image.originalname;
+            image_url = `http://localhost:3000/public/images/products/${originaFileName}`;
 
-            src.on('end', async () => {
-                try {
-                    let product = new Product({ ...payload, image_url: fileName });
-                    await product.save();
-                    return res.json(product);
-                } catch (err) {
-                    fs.unlinkSync(targetPath);
-                    if (err && err.name === 'ValidationError') {
-                        return res.json({
-                            error: 500,
-                            message: err.message,
-                            fields: err.errors
-                        });
-                    }
-
-                    next(err);
-                }
-            });
-
-            src.on('error', async () => {
-                next(err);
-            });
+            let product = new Product({ ...payload, image_url: image_url });
+            await product.save();
+            return res.json(product);
         } else {
             let product = new Product(payload);
             await product.save();
@@ -117,7 +91,13 @@ const getProducts = async (req, res, next) => {
             .populate('category')
             .populate('tags');
 
-        if (q && category && tags && product.length === 0) {
+        if (!q && !category && !tags && product.length === 0) {
+            return res.status(404).json({
+                message,
+                data: [],
+                count: count
+            });
+        } else if (q && category && tags && product.length === 0) {
             return res.json({
                 message: 'Produk tidak ditemukan sesuai filter yang diberikan.',
                 data: [],
@@ -143,10 +123,6 @@ const getProducts = async (req, res, next) => {
             });
         }
 
-        if (product.length === 0) {
-            return res.status(404).json({ message });
-        }
-
         return res.json({
             data: product,
             count
@@ -160,6 +136,21 @@ const editProductbyId = async (req, res, next) => {
     try {
         let payload = req.body;
         let { id } = req.params;
+        let image = req.file;
+        let product = await Product.findById(id);
+
+        if (!product) {
+            throw new Error('Produk tidak ditemukan');
+        }
+
+        if (!image) {
+            image_url = null;
+        }
+
+        if (image) {
+            image_url = `http://localhost:3000/public/images/${image.originalname}`;
+        }
+        payload.image_url = image_url;
 
         if (payload.category) {
             let category = await Category.findOne({
@@ -183,53 +174,12 @@ const editProductbyId = async (req, res, next) => {
             }
         }
 
-        if (req.file) {
-            let tmpPath = req.file.path;
-            let originalExt = req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
-            let fileName = req.file.filename + '.' + originalExt;
-            let targetPath = path.resolve(config.rootPath, `public/images/products/${fileName}`);
+        let updatedProduct = await Product.findByIdAndUpdate(id, payload, {
+            new: true,
+            runValidators: true
+        });
 
-            const src = fs.createReadStream(tmpPath);
-            const dest = fs.createWriteStream(targetPath);
-            src.pipe(dest);
-
-            src.on('end', async () => {
-                try {
-                    let product = await Product.findById(id);
-                    let currentImage = `${config.rootPath}/public/images/products/${product.image_url}`;
-                    if (fs.existsSync(currentImage)) {
-                        fs.unlinkSync(currentImage);
-                    }
-
-                    product = await Product.findByIdAndUpdate(id, payload, {
-                        new: true,
-                        runValidators: true
-                    });
-                    return res.json(product);
-                } catch (err) {
-                    fs.unlinkSync(targetPath);
-                    if (err && err.name === 'ValidationError') {
-                        return res.json({
-                            error: 400,
-                            message: err.message,
-                            fields: err.errors
-                        });
-                    }
-
-                    next(err);
-                }
-            });
-
-            src.on('error', async () => {
-                next(err);
-            });
-        } else {
-            let product = await Product.findByIdAndUpdate(id, payload, {
-                new: true,
-                runValidators: true
-            });
-            return res.json(product);
-        }
+        return res.json(updatedProduct);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
             return res.json({
@@ -245,12 +195,7 @@ const editProductbyId = async (req, res, next) => {
 
 const deleteProductById = async (req, res, next) => {
     try {
-        let product = await Product.findByIdAndDelete(req.params.id);
-
-        let currentImage = `${config.rootPath}/public/images/products/${product.image_url}`;
-        if (fs.existsSync(currentImage)) {
-            fs.unlinkSync(currentImage);
-        }
+        await Product.findByIdAndDelete(req.params.id);
 
         return res.json({
             status: 200,

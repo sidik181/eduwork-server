@@ -7,7 +7,6 @@ const getToken = (req) => {
 }
 
 // policy
-
 const policies = {
     guest(user, { can }) {
         can('read', 'Product');

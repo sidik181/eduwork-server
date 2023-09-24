@@ -18,5 +18,10 @@ router.delete(
     policeCheck('delete', 'User'),
     userController.deleteUserById
 );
+router.put(
+    '/user/:id',
+    policeCheck('update', 'User'),
+    userController.editUserById
+);
 
 module.exports = router;

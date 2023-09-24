@@ -34,6 +34,28 @@ const getAllUser = async (req, res, next) => {
     }
 }
 
+const editUserById = async (req, res, next) => {
+    try {
+        let payload = req.body;
+        let user = await User.findByIdAndUpdate(req.params.id, payload, {
+            new: true,
+            runValidators: true
+        });
+        return res.json(user);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+
+    }
+}
+
 const deleteUserById = async (req, res, next) => {
     try {
         await User.findByIdAndDelete(req.params.id);
@@ -57,5 +79,6 @@ const deleteUserById = async (req, res, next) => {
 module.exports = {
     addUser,
     getAllUser,
+    editUserById,
     deleteUserById,
 }

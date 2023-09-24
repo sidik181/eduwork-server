@@ -21,7 +21,7 @@ router.get(
 router.delete(
     '/cart/:id',
     policeCheck('delete', 'Cart'),
-    cartController.getAllCart
+    cartController.deleteCartItem
 );
 
 module.exports = router;

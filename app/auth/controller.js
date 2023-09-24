@@ -90,10 +90,49 @@ const me = (req, res, next) => {
         return res.status(200).json(req.user);
     }
 }
+
+const editMe = async (req, res, next) => {
+    let token = getToken(req);
+    let payload = req.body;
+
+    try {
+        if (!req.user || !token) {
+            return res.status(403).json({
+                error: 403,
+                message: 'Anda belum login atau token expired!'
+            });
+        }
+
+        if (payload.password) {
+            const hashedPassword = await bcrypt.hash(payload.password, 10);
+            payload.password = hashedPassword;
+        }
+
+        let user = await User.findByIdAndUpdate(req.params.id, payload, {
+            new: true,
+            runValidators: true
+        });
+
+        return res.status(200).json(user);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+    }
+}
+
+
 module.exports = {
     register,
     localStrategy,
     login,
     logout,
-    me
+    me,
+    editMe
 }

@@ -6,32 +6,33 @@ const addCartItem = async (req, res, next) => {
         const { items } = req.body;
         const productIds = items.map(item => item.product._id);
         const products = await Product.find({ _id: { $in: productIds } });
-        let cartItems = items.map(item => {
-            let relatedProduct = products.find(product => product._id.toString() === item.product._id);
-            return {
-                product: relatedProduct._id,
-                price: relatedProduct.price,
-                image_url: relatedProduct.image_url,
-                name: relatedProduct.name,
-                user: req.user._id,
-                qty: item.qty,
-                sub_total: relatedProduct.price * item.qty
-            }
-        });
+        const cartItems = [];
 
-        // await CartItem.deleteMany({ user: req.user._id });
-        await CartItem.bulkWrite(cartItems.map(item => {
-            return {
-                updateOne: {
-                    filter: {
+        for (const item of items) {
+            const relatedProduct = products.find(product => product._id.toString() === item.product._id);
+            if (relatedProduct) {
+                const existingCartItem = await CartItem.findOne({ user: req.user._id, product: relatedProduct._id });
+
+                if (existingCartItem) {
+                    existingCartItem.qty += item.qty;
+                    existingCartItem.sub_total = relatedProduct.price * existingCartItem.qty;
+                    await existingCartItem.save();
+                    cartItems.push(existingCartItem);
+                } else {
+                    const newCartItem = new CartItem({
+                        product: relatedProduct._id,
+                        price: relatedProduct.price,
+                        image_url: relatedProduct.image_url,
+                        name: relatedProduct.name,
                         user: req.user._id,
-                        product: item.product
-                    },
-                    update: item,
-                    upsert: true
+                        qty: item.qty,
+                        sub_total: relatedProduct.price * item.qty
+                    });
+                    await newCartItem.save();
+                    cartItems.push(newCartItem);
                 }
             }
-        }));
+        }
 
         return res.status(201).json(cartItems);
     } catch (err) {
@@ -44,7 +45,7 @@ const addCartItem = async (req, res, next) => {
         }
         next(err);
     }
-}
+};
 
 const updateCartItem = async (req, res, next) => {
     try {
@@ -61,6 +62,12 @@ const updateCartItem = async (req, res, next) => {
 
         if (!cartItem) {
             return res.status(404).json({ error: 'Item keranjang tidak ditemukan!' });
+        }
+
+        const product = await Product.findById(cartItem.product);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Produk tidak ditemukan di keranjang.!' });
         }
 
         const updatedSubTotal = cartItem.price * updatedQty;
@@ -109,10 +116,9 @@ const getAllCart = async (req, res, next) => {
 
 const deleteCartItem = async (req, res, next) => {
     try {
-        const { cartItemId } = req.params;
-        const userId = req.user._id;
+        const { id } = req.params;
 
-        await CartItem.deleteOne({ _id: cartItemId, user: userId });
+        await CartItem.deleteMany({ _id: { $in: id }, user: req.user._id });
 
         return res.status(204).send();
     } catch (err) {

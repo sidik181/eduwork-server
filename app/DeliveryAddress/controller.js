@@ -57,12 +57,11 @@ const editDeliveryAddressById = async (req, res, next) => {
 
 const deleteDeliveryAddressById = async (req, res, next) => {
     try {
-        let { _id, ...payload } = req.body;
         let { id } = req.params;
         let policy = policyFor(req.user);
         let address = await DeliveryAddress.findById(id);
         let subjectAddress = subject('DeliveryAddress', { ...address, user_id: address.user });
-        if (!policy.can('update', subjectAddress)) {
+        if (!policy.can('delete', subjectAddress)) {
             return res.status(403).json({
                 message: 'Anda tidak memiliki hak akses!'
             });

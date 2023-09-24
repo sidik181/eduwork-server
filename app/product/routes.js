@@ -1,13 +1,14 @@
 const router = require('express').Router();
 const multer = require('multer');
-const os = require('os');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const productController = require('./controller');
 const { policeCheck } = require('../../middlewares');
 
 router.post(
     '/product',
-    multer({ dest: os.tmpdir() }).single('image'),
+    upload.single('image'),
     policeCheck('create', 'Product'),
     productController.addProduct
 );
@@ -17,7 +18,7 @@ router.get(
 );
 router.put(
     '/product/:id',
-    multer({ dest: os.tmpdir() }).single('image'),
+    upload.single('image'),
     policeCheck('update', 'Product'),
     productController.editProductbyId
 );
