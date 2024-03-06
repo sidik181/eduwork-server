@@ -68,7 +68,36 @@ const getAllTag = async (req, res, next) => {
     } catch (err) {
         if (err && err.name === 'ValidationError') {
             return res.json({
-                error: 1,
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+    }
+}
+
+const getTagsByCategory = async (req, res, next) => {
+    try {
+        const { category } = req.params;
+        const categoryId = await Category.findOne({ name: { $regex: category, $options: 'i' } });
+        const products = await Product.find({ category: categoryId });
+        let tagIds = [];
+        products.forEach(product => {
+            product.tags.forEach(tag => {
+                if (!tagIds.includes(tag)) {
+                    tagIds.push(tag)
+                }
+            });
+        });
+
+        const tags = await Tag.find({ _id: { $in: tagIds } });
+        res.json(tags);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
                 message: err.message,
                 fields: err.errors
             });
@@ -82,5 +111,6 @@ module.exports = {
     addTag,
     editTagById,
     deleteTagById,
-    getAllTag
+    getAllTag,
+    getTagsByCategory
 }

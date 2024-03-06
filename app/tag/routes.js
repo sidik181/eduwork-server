@@ -14,6 +14,10 @@ router.get(
     '/tags',
     tagController.getAllTag
 );
+router.get(
+    '/tags/:category',
+    tagController.getTagsByCategory
+);
 router.put(
     '/tag/:id',
     policeCheck('update', 'Tag'),
