@@ -1,4 +1,6 @@
 const Tag = require('./model');
+const Category = require('../category/model')
+const Product = require('../product/model')
 
 const addTag = async (req, res, next) => {
     try {
