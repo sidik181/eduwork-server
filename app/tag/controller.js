@@ -68,7 +68,16 @@ const editTagById = async (req, res, next) => {
 
 const deleteTagById = async (req, res, next) => {
     try {
-        await Tag.findByIdAndDelete(req.params.id);
+        const tagId = req.params.id;
+        const productUsingTag = await Product.findOne({ tags: tagId });
+
+        if (productUsingTag) {
+            return res.status(400).json({
+                message: 'Tag tidak dapat dihapus karena sedang digunakan oleh produk.'
+            });
+        }
+
+        await Tag.findByIdAndDelete(tagId);
         return res.json({
             status: 200,
             message: 'Tag berhasil dihapus'
@@ -84,7 +93,8 @@ const deleteTagById = async (req, res, next) => {
 
         next(err);
     }
-}
+};
+
 
 const getAllTag = async (req, res, next) => {
     try {
