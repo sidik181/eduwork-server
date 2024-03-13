@@ -14,6 +14,10 @@ router.get(
     '/categories',
     categoryController.getAllCategory
 );
+router.get(
+    '/category/:id',
+    categoryController.getCategoryById
+);
 router.put(
     '/category/:id',
     policeCheck('update', 'Category'),

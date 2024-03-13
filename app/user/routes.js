@@ -13,6 +13,11 @@ router.get(
     policeCheck('read', 'User'),
     userController.getAllUser
 );
+router.get(
+    '/user/:id',
+    policeCheck('read', 'User'),
+    userController.getUserById
+);
 router.delete(
     '/user/:id',
     policeCheck('delete', 'User'),

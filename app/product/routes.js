@@ -16,6 +16,10 @@ router.get(
     '/products',
     productController.getProducts
 );
+router.get(
+    '/product/:id',
+    productController.getProductById
+);
 router.put(
     '/product/:id',
     upload.single('image'),

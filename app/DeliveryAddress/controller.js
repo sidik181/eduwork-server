@@ -25,6 +25,38 @@ const addDeliveryAddress = async (req, res, next) => {
     }
 }
 
+const getDeliveryAddressById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const policy = policyFor(req.user);
+        const address = await DeliveryAddress.findById(id);
+
+        if (!address) {
+            return res.status(404).json({ message: 'Alamat pengiriman tidak ditemukan' });
+        }
+
+        const subjectAddress = subject('DeliveryAddress', { ...address, user_id: address.user });
+        if (!policy.can('read', subjectAddress)) {
+            return res.status(403).json({
+                message: 'Anda tidak memiliki hak akses!'
+            });
+        }
+
+        return res.json(address);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+    }
+};
+
+
 const editDeliveryAddressById = async (req, res, next) => {
     try {
         let { _id, ...payload } = req.body;
@@ -116,4 +148,5 @@ module.exports = {
     editDeliveryAddressById,
     deleteDeliveryAddressById,
     getAllDeliveryAddress,
+    getDeliveryAddressById
 }

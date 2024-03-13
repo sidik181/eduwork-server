@@ -21,6 +21,29 @@ const addTag = async (req, res, next) => {
     }
 }
 
+const getTagById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const tag = await Tag.findById(id);
+
+        if (!tag) {
+            return res.status(404).json({ message: 'Tag tidak ditemukan' });
+        }
+
+        return res.json(tag);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+    }
+};
+
 const editTagById = async (req, res, next) => {
     try {
         let payload = req.body;
@@ -114,5 +137,6 @@ module.exports = {
     editTagById,
     deleteTagById,
     getAllTag,
-    getTagsByCategory
+    getTagsByCategory,
+    getTagById
 }

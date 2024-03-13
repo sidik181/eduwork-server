@@ -193,6 +193,29 @@ const editProductbyId = async (req, res, next) => {
     }
 };
 
+const getProductById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findById(id).populate('category').populate('tags');
+
+        if (!product) {
+            return res.status(404).json({ message: 'Produk tidak ditemukan' });
+        }
+
+        return res.json(product);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+    }
+};
+
 const deleteProductById = async (req, res, next) => {
     try {
         await Product.findByIdAndDelete(req.params.id);
@@ -210,5 +233,6 @@ module.exports = {
     addProduct,
     getProducts,
     editProductbyId,
-    deleteProductById
+    deleteProductById,
+    getProductById
 }

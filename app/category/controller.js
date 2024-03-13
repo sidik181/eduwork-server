@@ -19,6 +19,29 @@ const addCategory = async (req, res, next) => {
     }
 }
 
+const getCategoryById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const category = await Category.findById(id);
+
+        if (!category) {
+            return res.status(404).json({ message: 'Kategori tidak ditemukan' });
+        }
+
+        return res.json(category);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+    }
+};
+
 const editCatogoryById = async (req, res, next) => {
     try {
         let payload = req.body;
@@ -82,5 +105,6 @@ module.exports = {
     addCategory,
     editCatogoryById,
     deleteCategoryById,
-    getAllCategory
+    getAllCategory,
+    getCategoryById
 }

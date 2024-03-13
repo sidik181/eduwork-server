@@ -15,6 +15,10 @@ router.get(
     tagController.getAllTag
 );
 router.get(
+    '/tag/:id',
+    tagController.getTagById
+);
+router.get(
     '/tags/:category',
     tagController.getTagsByCategory
 );

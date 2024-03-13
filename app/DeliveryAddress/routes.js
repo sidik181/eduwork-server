@@ -21,6 +21,11 @@ router.get(
     policeCheck('view', 'DeliveryAddress'),
     deliveryAddressController.getAllDeliveryAddress
 );
+router.get(
+    '/delivery-address/:id',
+    policeCheck('read', 'DeliveryAddress'),
+    deliveryAddressController.getDeliveryAddressById
+);
 router.delete(
     '/delivery-address/:id',
     policeCheck('delete', 'DeliveryAddress'),

@@ -18,6 +18,29 @@ const addUser = async (req, res, next) => {
     }
 }
 
+const getUserById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User tidak ditemukan' });
+        }
+
+        return res.json(user);
+    } catch (err) {
+        if (err && err.name === 'ValidationError') {
+            return res.json({
+                error: 500,
+                message: err.message,
+                fields: err.errors
+            });
+        }
+
+        next(err);
+    }
+};
+
 const getAllUser = async (req, res, next) => {
     try {
         let users = await User.find();
@@ -81,4 +104,5 @@ module.exports = {
     getAllUser,
     editUserById,
     deleteUserById,
+    getUserById
 }
