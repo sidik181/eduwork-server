@@ -91,35 +91,35 @@ const getProducts = async (req, res, next) => {
             .populate('category')
             .populate('tags');
 
-        if (!q && !category && !tags && product.length === 0) {
+        if (product.length === 0) {
             return res.status(404).json({
                 message,
                 data: [],
-                count: count
+                count
             });
         } else if (q && category && tags && product.length === 0) {
             return res.status(404).json({
                 message: 'Produk tidak ditemukan sesuai filter yang diberikan.',
                 data: [],
-                count: count
+                count
             });
         } else if (q && product.length === 0) {
             return res.status(404).json({
                 message: `Nama produk ${q} tidak ada.`,
                 data: [],
-                count: count
+                count
             });
         } else if (category && product.length === 0) {
             return res.status(404).json({
                 message: `Kategori ${category} tidak ada.`,
                 data: [],
-                count: count
+                count
             });
         } else if (tags.length > 0 && product.length === 0) {
             return res.status(404).json({
                 message: `Tag ${tags} tidak ada.`,
                 data: [],
-                count: count
+                count
             });
         } else {
             return res.status(200).json({
