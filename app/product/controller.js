@@ -115,14 +115,9 @@ const getProducts = async (req, res, next) => {
                 data: [],
                 count: count
             });
-        } else if (tags && product.length === 0) {
+        } else if (tags.length > 0 && product.length === 0) {
             return res.json({
                 message: `Tag ${tags} tidak ada.`,
-                data: [],
-                count: count
-            });
-        } else if (tags && product.length === 0) {
-            return res.json({
                 data: [],
                 count: count
             });
