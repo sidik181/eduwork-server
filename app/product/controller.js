@@ -91,13 +91,7 @@ const getProducts = async (req, res, next) => {
             .populate('category')
             .populate('tags');
 
-        if (product.length === 0) {
-            return res.status(404).json({
-                message,
-                data: [],
-                count
-            });
-        } else if (q && category && tags && product.length === 0) {
+        if (q && category && tags && product.length === 0) {
             return res.status(404).json({
                 message: 'Produk tidak ditemukan sesuai filter yang diberikan.',
                 data: [],
@@ -121,7 +115,13 @@ const getProducts = async (req, res, next) => {
                 data: [],
                 count
             });
-        } else {
+         } else if (product.length === 0) {
+             return res.status(404).json({
+                 message,
+                 data: [],
+                 count
+             });
+         } else {
             return res.status(200).json({
                 data: product,
                 count
