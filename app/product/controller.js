@@ -91,7 +91,7 @@ const getProducts = async (req, res, next) => {
             .populate('category')
             .populate('tags');
 
-        if (!q && !category && !tags && product.length === 0) {
+        if (!q && !category && tags.length > 0 && product.length === 0) {
             return res.status(404).json({
                 message,
                 data: [],
@@ -115,7 +115,7 @@ const getProducts = async (req, res, next) => {
                 data: [],
                 count: count
             });
-        } else if (tags.length > 0 && product.length === 0) {
+        } else if (tags && product.length === 0) {
             return res.json({
                 message: `Tag ${tags} tidak ada.`,
                 data: [],
