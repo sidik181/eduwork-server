@@ -121,6 +121,11 @@ const getProducts = async (req, res, next) => {
                 data: [],
                 count: count
             });
+        } else if (tags && product.length === 0) {
+            return res.json({
+                data: [],
+                count: count
+            });
         }
 
         return res.json({

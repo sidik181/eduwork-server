@@ -54,7 +54,7 @@ const getDeliveryAddressById = async (req, res, next) => {
 
         next(err);
     }
-};
+}
 
 
 const editDeliveryAddressById = async (req, res, next) => {
@@ -118,14 +118,22 @@ const deleteDeliveryAddressById = async (req, res, next) => {
 const getAllDeliveryAddress = async (req, res, next) => {
     try {
         let { skip = 0, limit = 10 } = req.query;
+        let queryCondition = {};
+
+        if (req.user.role === 'admin') {
+            queryCondition = {};
+        } else {
+            queryCondition = { user: req.user._id };
+        }
+
         let address =
             await DeliveryAddress
-                .find({ user: req.user._id })
+                .find(queryCondition)
                 .skip(parseInt(skip))
                 .limit(parseInt(limit))
                 .sort('-createdAt');
 
-        let count = await DeliveryAddress.find({ user: req.user._id }).countDocuments();
+        let count = await DeliveryAddress.find(queryCondition).countDocuments();
         return res.json({
             data: address,
             count
