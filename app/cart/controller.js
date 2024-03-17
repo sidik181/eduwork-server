@@ -120,7 +120,7 @@ const deleteCartItem = async (req, res, next) => {
 
         await CartItem.deleteMany({ _id: { $in: id }, user: req.user._id });
 
-        return res.status(204).send();
+        return res.status(200).json({ message: 'Peroduk berhasil dihapus dari keranjang' });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
             return res.json({
