@@ -5,11 +5,11 @@ const addUser = async (req, res, next) => {
         const payload = req.body;
         let user = new User(payload);
         await user.save();
-        return res.json(user);
+        return res.status(201).json(user);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -27,11 +27,11 @@ const getUserById = async (req, res, next) => {
             return res.status(404).json({ message: 'User tidak ditemukan' });
         }
 
-        return res.json(user);
+        return res.status(200).json(user);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -44,11 +44,11 @@ const getUserById = async (req, res, next) => {
 const getAllUser = async (req, res, next) => {
     try {
         let users = await User.find();
-        return res.json(users);
+        return res.status(200).json(users);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -64,11 +64,11 @@ const editUserById = async (req, res, next) => {
             new: true,
             runValidators: true
         });
-        return res.json(user);
+        return res.status(201).json(user);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -88,8 +88,8 @@ const deleteUserById = async (req, res, next) => {
         });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });

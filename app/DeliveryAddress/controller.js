@@ -14,8 +14,8 @@ const addDeliveryAddress = async (req, res, next) => {
         });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -42,11 +42,11 @@ const getDeliveryAddressById = async (req, res, next) => {
             });
         }
 
-        return res.json(address);
+        return res.status(200).json(address);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -77,8 +77,8 @@ const editDeliveryAddressById = async (req, res, next) => {
         return res.status(201).json(address);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -105,8 +105,8 @@ const deleteDeliveryAddressById = async (req, res, next) => {
         });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -134,14 +134,14 @@ const getAllDeliveryAddress = async (req, res, next) => {
                 .sort('-createdAt');
 
         let count = await DeliveryAddress.find(queryCondition).countDocuments();
-        return res.json({
+        return res.status(200).json({
             data: address,
             count
         });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });

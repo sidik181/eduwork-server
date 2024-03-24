@@ -10,11 +10,11 @@ const register = async (req, res, next) => {
         const payload = req.body;
         let user = new User(payload);
         await user.save();
-        return res.json(user);
+        return res.status(200).json(user);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 400,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -52,7 +52,7 @@ const login = (req, res, next) => {
         let signed = jwt.sign(user, config.secretKey);
 
         await User.findByIdAndUpdate(user._id, { $push: { token: signed } });
-        return res.json({
+        return res.status(200).json({
             message: 'Login Berhasil',
             user,
             token: signed
@@ -116,8 +116,8 @@ const editMe = async (req, res, next) => {
         return res.status(200).json(user);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });

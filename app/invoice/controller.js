@@ -23,8 +23,8 @@ const getInvoiceByIdOrder = async (req, res, next) => {
 
         return res.status(200).json(invoice);
     } catch (err) {
-        return res.json({
-            error: 500,
+        return res.status(400).json({
+            error: true,
             message: err.message,
             fields: err.errors
         });
@@ -44,7 +44,11 @@ const getAllInvoice = async (req, res, next) => {
             count
         });
     } catch (err) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        return res.status(400).json({
+            error: true,
+            message: err.message,
+            fields: err.errors
+        });
     }
 }
 

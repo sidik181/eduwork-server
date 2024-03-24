@@ -37,8 +37,8 @@ const addCartItem = async (req, res, next) => {
         return res.status(201).json(cartItems);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -84,8 +84,8 @@ const updateCartItem = async (req, res, next) => {
         return res.status(200).json({ message: 'Item keranjang berhasil diperbarui' });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -104,8 +104,8 @@ const getAllCart = async (req, res, next) => {
         return res.status(200).json(items);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -118,13 +118,17 @@ const deleteCartItem = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        await CartItem.deleteMany({ _id: { $in: id }, user: req.user._id });
+        const result = await CartItem.deleteOne({ _id: id, user: req.user._id });
+
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Produk tidak ditemukan atau bukan milik pengguna' });
+        }
 
         return res.status(200).json({ message: 'Peroduk berhasil dihapus dari keranjang' });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });

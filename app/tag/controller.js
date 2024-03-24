@@ -7,11 +7,11 @@ const addTag = async (req, res, next) => {
         let payload = req.body;
         let tag = new Tag(payload);
         await tag.save();
-        return res.json(tag);
+        return res.status(201).json(tag);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -30,11 +30,11 @@ const getTagById = async (req, res, next) => {
             return res.status(404).json({ message: 'Tag tidak ditemukan' });
         }
 
-        return res.json(tag);
+        return res.status(200).json(tag);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -51,11 +51,11 @@ const editTagById = async (req, res, next) => {
             new: true,
             runValidators: true
         });
-        return res.json(tag);
+        return res.status(201).json(tag);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -84,8 +84,8 @@ const deleteTagById = async (req, res, next) => {
         });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -99,11 +99,11 @@ const deleteTagById = async (req, res, next) => {
 const getAllTag = async (req, res, next) => {
     try {
         let tag = await Tag.find();
-        return res.json(tag);
+        return res.status(200).json(tag);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -128,11 +128,11 @@ const getTagsByCategory = async (req, res, next) => {
         });
 
         const tags = await Tag.find({ _id: { $in: tagIds } });
-        res.json(tags);
+        res.status(200).json(tags);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });

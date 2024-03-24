@@ -21,6 +21,7 @@ const policies = {
         can('update', 'Cart', { user_id: user._id });
         can('delete', 'Cart', { user_id: user._id });
         can('view', 'DeliveryAddress', { user_id: user._id });
+        can('read', 'DeliveryAddress', { user_id: user._id });
         can('create', 'DeliveryAddress', { user_id: user._id });
         can('update', 'DeliveryAddress', { user_id: user._id });
         can('delete', 'DeliveryAddress', { user_id: user._id });

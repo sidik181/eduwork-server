@@ -37,16 +37,16 @@ const addProduct = async (req, res, next) => {
 
             let product = new Product({ ...payload, image_url: image_url });
             await product.save();
-            return res.json(product);
+            return res.status(200).json(product);
         } else {
             let product = new Product(payload);
             await product.save();
-            return res.json(product);
+            return res.status(200).json(product);
         }
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -116,7 +116,7 @@ const getProducts = async (req, res, next) => {
                 count
             });
          } else if (product.length === 0) {
-             return res.status(404).json({
+             return res.status(200).json({
                  message,
                  data: [],
                  count
@@ -179,11 +179,11 @@ const editProductbyId = async (req, res, next) => {
             runValidators: true
         });
 
-        return res.json(updatedProduct);
+        return res.status(201).json(updatedProduct);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -202,11 +202,11 @@ const getProductById = async (req, res, next) => {
             return res.status(404).json({ message: 'Produk tidak ditemukan' });
         }
 
-        return res.json(product);
+        return res.status(200).json(product);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });

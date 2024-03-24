@@ -9,13 +9,13 @@ const addOrder = async (req, res, next) => {
         let { delivery_fee, delivery_address } = req.body;
         let items = await CartItem.find({ user: req.user._id }).populate('product');
         if (items.length === 0) {
-            return res.status(201).json({
+            return res.status(200).json({
                 message: 'Anda tidak memiliki order, karena tidak ada barang di keranjang.'
             });
         }
         let address = await DeliveryAddress.findById(delivery_address);
         if (!address) {
-            return res.status(400).json({
+            return res.status(404).json({
                 message: 'Alamat pengiriman tidak ditemukan.'
             });
         }
@@ -48,11 +48,11 @@ const addOrder = async (req, res, next) => {
 
         await order.save();
         await CartItem.deleteMany({ user: req.user._id });
-        return res.json(order);
+        return res.status(200).json(order);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: 500,
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
@@ -79,8 +79,8 @@ const getAllOrder = async (req, res, next) => {
         });
     } catch (err) {
         if (err && err.name === 'ValidationError') {
-            return res.json({
-                error: "Validasi pesanan gagal",
+            return res.status(400).json({
+                error: true,
                 message: err.message,
                 fields: err.errors
             });
