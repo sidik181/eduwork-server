@@ -36,10 +36,10 @@ const getAllInvoice = async (req, res, next) => {
         const user = req.user;
         let queryCondition = {};
 
-        if (req.user.role === 'admin') {
+        if (user.role === 'admin') {
             queryCondition = {};
         } else {
-            queryCondition = { user: req.user._id };
+            queryCondition = { user: user._id };
         }
 
         const invoices = await Invoice.find(queryCondition).populate('order');
