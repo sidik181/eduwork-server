@@ -65,7 +65,7 @@ const editUserById = async (req, res, next) => {
         if (payload.email) {
             const existingUser = await User.findOne({ email: payload.email });
 
-            if (existingUser && !existingUser._id.equals(id)) {
+            if (existingUser && !existingUser._id.equals(mongoose.Types.ObjectId(id))) {
                 return res.status(400).json({
                     error: true,
                     message: "Email sudah terdaftar dengan user lain."
@@ -73,10 +73,17 @@ const editUserById = async (req, res, next) => {
             }
         }
 
-        let user = await User.findByIdAndUpdate(id, payload, {
+        const user = await User.findByIdAndUpdate(id, payload, {
             new: true,
             runValidators: true
         });
+
+        if (!user) {
+            return res.status(404).json({
+                error: true,
+                message: "User tidak ditemukan."
+            });
+        }
 
         return res.status(201).json(user);
     } catch (err) {
