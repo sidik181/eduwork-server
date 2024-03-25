@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const User = require('./model')
 
 const addUser = async (req, res, next) => {
@@ -66,7 +65,7 @@ const editUserById = async (req, res, next) => {
         if (payload.email) {
             const existingUser = await User.findOne({ email: payload.email });
 
-            if (existingUser && !existingUser._id.equals(mongoose.Types.ObjectId(id))) {
+            if (existingUser && existingUser._id.toString() !== id) {
                 return res.status(400).json({
                     error: true,
                     message: "Email sudah terdaftar dengan user lain."
