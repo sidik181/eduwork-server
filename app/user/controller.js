@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('./model')
 
 const addUser = async (req, res, next) => {
