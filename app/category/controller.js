@@ -98,7 +98,7 @@ const deleteCategoryById = async (req, res, next) => {
 const getAllCategory = async (req, res, next) => {
     try {
         let category = await Category.find();
-        return res.staus(200).json(category);
+        return res.status(200).json(category);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
             return res.status(400).json({
