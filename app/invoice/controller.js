@@ -34,10 +34,17 @@ const getInvoiceByIdOrder = async (req, res, next) => {
 const getAllInvoice = async (req, res, next) => {
     try {
         const user = req.user;
+        let queryCondition = {};
 
-        const invoices = await Invoice.find({ user: user }).populate('order');
+        if (req.user.role === 'admin') {
+            queryCondition = {};
+        } else {
+            queryCondition = { user: req.user._id };
+        }
 
-        let count = await Invoice.find({ user: user }).countDocuments();
+        const invoices = await Invoice.find(queryCondition).populate('order');
+
+        let count = await Invoice.find(queryCondition).countDocuments();
 
         res.status(200).json({
             data: invoices,

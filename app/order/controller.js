@@ -65,14 +65,22 @@ const addOrder = async (req, res, next) => {
 const getAllOrder = async (req, res, next) => {
     try {
         let { skip = 0, limit = 10 } = req.query;
+        let queryCondition = {};
+
+        if (req.user.role === 'admin') {
+            queryCondition = {};
+        } else {
+            queryCondition = { user: req.user._id };
+        }
+
         let orders = await Order
-            .find({ user: req.user._id })
+            .find(queryCondition)
             .skip(parseInt(skip))
             .limit(parseInt(limit))
             .populate('order_items')
             .sort('-createdAt');
 
-        let count = await Order.find({ user: req.user._id }).countDocuments();
+        let count = await Order.find(queryCondition).countDocuments();
         return res.status(200).json({
             data: orders.map(order => order.toJSON({ virtuals: true })),
             count
