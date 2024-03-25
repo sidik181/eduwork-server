@@ -59,11 +59,25 @@ const getAllUser = async (req, res, next) => {
 
 const editUserById = async (req, res, next) => {
     try {
-        let payload = req.body;
-        let user = await User.findByIdAndUpdate(req.params.id, payload, {
+        const { id } = req.params;
+        const payload = req.body;
+
+        if (payload.email) {
+            const existingUser = await User.findOne({ email: payload.email });
+
+            if (existingUser && !existingUser._id.equals(id)) {
+                return res.status(400).json({
+                    error: true,
+                    message: "Email sudah terdaftar dengan user lain."
+                });
+            }
+        }
+
+        let user = await User.findByIdAndUpdate(id, payload, {
             new: true,
             runValidators: true
         });
+
         return res.status(201).json(user);
     } catch (err) {
         if (err && err.name === 'ValidationError') {
