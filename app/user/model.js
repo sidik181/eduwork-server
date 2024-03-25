@@ -40,13 +40,15 @@ userSchema.path('email').validate(function (value) {
 }, attr => `${attr.value} harus merupakan email yang valid!`);
 
 userSchema.path('email').validate(async function (value) {
-    try {
-        const count = await this.model('User').count({ email: value });
-        return !count;
-    } catch (err) {
-        throw err;
+    if (this.isNew || this.isModified('email')) {
+        const existingUser = await this.model('User').findOne({ email: value });
+        if (existingUser) {
+            return existingUser._id.equals(this._id);
+        }
     }
+    return true;
 }, attr => `${attr.value} sudah terdaftar`);
+
 
 const HASH_ROUND = 10;
 userSchema.pre('save', async function (next) {
